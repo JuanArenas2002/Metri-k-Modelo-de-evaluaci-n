@@ -1,4 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type Dispatch,
+  type PointerEvent as RPointerEvent,
+  type ReactElement,
+  type SetStateAction,
+} from 'react'
 import {
   Star,
   Microscope,
@@ -49,6 +60,52 @@ const I = {
   globeAlt:    <Globe2 strokeWidth={1.6} />,
   grip:        <GripVertical strokeWidth={1.8} />,
   reset:       <RotateCcw strokeWidth={1.8} />,
+} satisfies Record<string, ReactElement>
+
+type IconKey = keyof typeof I
+
+/* ========== Tipos del dominio ========== */
+
+type Kind = 'core' | 'eje1' | 'eje2' | 'eje3' | 'dt'
+
+type EjeKey = 'E1' | 'E2' | 'E3' | 'DT'
+type DimKey =
+  | 'D1' | 'D2' | 'D3' | 'D4' | 'D5'
+  | 'D6' | 'D7' | 'D8' | 'D9' | 'D10'
+  | 'D11' | 'D13'
+type NodeKey = 'CORE' | EjeKey | DimKey
+
+interface NodeData {
+  x: number
+  y: number
+  r: number
+  label: string
+  kind: Kind
+  sub?: string
+  icon?: IconKey
+}
+
+interface KindColor {
+  bg: string
+  stroke: string
+  text: string
+  soft: string
+}
+
+interface NodeInfo {
+  title: string
+  meta: string
+}
+
+interface DragState {
+  key: NodeKey
+  startClientX: number
+  startClientY: number
+  startX: number
+  startY: number
+  rectW: number
+  rectH: number
+  moved: boolean
 }
 
 /* ========== Logo ========== */
@@ -121,7 +178,7 @@ function Header() {
 /* ========== Panel izquierdo ========== */
 
 function LeftPanel() {
-  const pillars = [
+  const pillars: { icon: ReactElement; label: string }[] = [
     { icon: I.shieldCheck, label: 'Enfoque integral y sistémico' },
     { icon: I.impact,      label: 'Impacto académico y social' },
     { icon: I.trendUp,     label: 'Mejora continua y sostenible' },
@@ -169,14 +226,14 @@ function LeftPanel() {
   )
 }
 
-/* ========== Diagrama ========== */
+/* ========== Diagrama: constantes ========== */
 
 const VB_W = 1200
 const VB_H = 720
 
 /** Estado inicial de cada nodo: posición y radio en unidades de viewBox */
-const INITIAL_NODES = {
-  CORE: { x: 540, y: 380, r: 100, label: 'MODELO DE EVALUACIÓN', kind: 'core', icon: null, sub: null },
+const INITIAL_NODES: Record<NodeKey, NodeData> = {
+  CORE: { x: 540, y: 380, r: 100, label: 'MODELO DE EVALUACIÓN', kind: 'core' },
 
   E1:   { x: 700,  y: 130, r: 82, label: 'Eje 1', sub: 'Calidad Académica',         kind: 'eje1' },
   E2:   { x: 260,  y: 510, r: 84, label: 'Eje 2', sub: 'Pertinencia y Coherencia',  kind: 'eje2' },
@@ -199,14 +256,14 @@ const INITIAL_NODES = {
   D13:  { x: 820,  y: 615, r: 28, label: 'D13', icon: 'megaphone', kind: 'eje3' },
 }
 
-const EDGES = [
+const EDGES: ReadonlyArray<readonly [NodeKey, NodeKey]> = [
   ['CORE', 'E1'], ['CORE', 'E2'], ['CORE', 'E3'], ['CORE', 'DT'],
   ['E1', 'D3'], ['E1', 'D4'], ['E1', 'D10'],
   ['E2', 'D1'], ['E2', 'D2'], ['E2', 'D5'],
   ['E3', 'D6'], ['E3', 'D7'], ['E3', 'D8'], ['E3', 'D11'], ['E3', 'D9'], ['E3', 'D13'],
 ]
 
-const KIND_COLOR = {
+const KIND_COLOR: Record<Kind, KindColor> = {
   core: { bg: '#2aa39a', stroke: '#1f8a82', text: '#ffffff', soft: '#d8efed' },
   eje1: { bg: '#98989a', stroke: '#7a7a7c', text: '#ffffff', soft: '#efeff0' },
   eje2: { bg: '#c97a52', stroke: '#a86238', text: '#ffffff', soft: '#f8e7dd' },
@@ -214,34 +271,54 @@ const KIND_COLOR = {
   dt:   { bg: '#d4b274', stroke: '#b08e4f', text: '#ffffff', soft: '#f6ecd5' },
 }
 
-/** Información profesional de cada nodo para el tooltip */
-const NODE_INFO = {
-  CORE: { title: 'Modelo de Evaluación',         meta: 'Centro del ecosistema institucional' },
-  E1:   { title: 'Eje 1 · Calidad Académica',    meta: 'Excelencia, impacto científico y productividad' },
+/** Información de cada nodo para el tooltip */
+const NODE_INFO: Record<NodeKey, NodeInfo> = {
+  CORE: { title: 'Modelo de Evaluación',             meta: 'Centro del ecosistema institucional' },
+  E1:   { title: 'Eje 1 · Calidad Académica',        meta: 'Excelencia, impacto científico y productividad' },
   E2:   { title: 'Eje 2 · Pertinencia y Coherencia', meta: 'Articulación con necesidades sociales' },
   E3:   { title: 'Eje 3 · Desarrollo Institucional', meta: 'Sostenibilidad y proyección global' },
-  DT:   { title: 'Dimensión Transversal',        meta: 'Ética e integridad en toda actuación' },
-  D1:   { title: 'D1 · Coherencia',              meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D2:   { title: 'D2 · Pertinencia',             meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D3:   { title: 'D3 · Excelencia',              meta: 'Eje 1 · Calidad Académica' },
-  D4:   { title: 'D4 · Impacto Científico',      meta: 'Eje 1 · Calidad Académica' },
-  D5:   { title: 'D5 · Impacto Social',          meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D6:   { title: 'D6 · Sostenibilidad',          meta: 'Eje 3 · Desarrollo Institucional' },
-  D7:   { title: 'D7 · Formación',               meta: 'Eje 3 · Desarrollo Institucional' },
-  D8:   { title: 'D8 · Colaboración',            meta: 'Eje 3 · Desarrollo Institucional' },
-  D9:   { title: 'D9 · Gobernanza',              meta: 'Eje 3 · Desarrollo Institucional' },
-  D10:  { title: 'D10 · Productividad',          meta: 'Eje 1 · Calidad Académica' },
-  D11:  { title: 'D11 · Internacionalización',   meta: 'Eje 3 · Desarrollo Institucional' },
-  D13:  { title: 'D13 · Visibilidad',            meta: 'Eje 3 · Desarrollo Institucional' },
+  DT:   { title: 'Dimensión Transversal',            meta: 'Ética e integridad en toda actuación' },
+  D1:   { title: 'D1 · Coherencia',                  meta: 'Eje 2 · Pertinencia y Coherencia' },
+  D2:   { title: 'D2 · Pertinencia',                 meta: 'Eje 2 · Pertinencia y Coherencia' },
+  D3:   { title: 'D3 · Excelencia',                  meta: 'Eje 1 · Calidad Académica' },
+  D4:   { title: 'D4 · Impacto Científico',          meta: 'Eje 1 · Calidad Académica' },
+  D5:   { title: 'D5 · Impacto Social',              meta: 'Eje 2 · Pertinencia y Coherencia' },
+  D6:   { title: 'D6 · Sostenibilidad',              meta: 'Eje 3 · Desarrollo Institucional' },
+  D7:   { title: 'D7 · Formación',                   meta: 'Eje 3 · Desarrollo Institucional' },
+  D8:   { title: 'D8 · Colaboración',                meta: 'Eje 3 · Desarrollo Institucional' },
+  D9:   { title: 'D9 · Gobernanza',                  meta: 'Eje 3 · Desarrollo Institucional' },
+  D10:  { title: 'D10 · Productividad',              meta: 'Eje 1 · Calidad Académica' },
+  D11:  { title: 'D11 · Internacionalización',       meta: 'Eje 3 · Desarrollo Institucional' },
+  D13:  { title: 'D13 · Visibilidad',                meta: 'Eje 3 · Desarrollo Institucional' },
 }
 
-/** Tooltip flotante que sigue al nodo activo */
-function NodeTooltip({ node, kind }) {
-  if (!node) return null
+const KIND_TO_EJE: Record<Exclude<Kind, 'core'>, EjeKey> = {
+  eje1: 'E1',
+  eje2: 'E2',
+  eje3: 'E3',
+  dt:   'DT',
+}
+
+const EJE_KEYS: ReadonlySet<NodeKey> = new Set<NodeKey>(['E1', 'E2', 'E3', 'DT'])
+
+/* ========== Tooltip flotante ========== */
+
+interface TooltipNode {
+  key: NodeKey
+  x: number
+  y: number
+  r: number
+}
+
+interface NodeTooltipProps {
+  node: TooltipNode
+  kind: Kind
+}
+
+function NodeTooltip({ node, kind }: NodeTooltipProps) {
   const info = NODE_INFO[node.key]
   if (!info) return null
   const c = KIND_COLOR[kind]
-  // Posicionar el tooltip por encima del nodo, con conversión a %
   const left = `${(node.x / VB_W) * 100}%`
   const top = `${((node.y - node.r) / VB_H) * 100}%`
   return (
@@ -260,7 +337,6 @@ function NodeTooltip({ node, kind }) {
           {info.title}
         </div>
         <div className="mt-0.5 text-[11px] text-ink-soft">{info.meta}</div>
-        {/* Flecha apuntando al nodo */}
         <span
           aria-hidden
           className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-px"
@@ -275,46 +351,53 @@ function NodeTooltip({ node, kind }) {
   )
 }
 
-const KIND_TO_EJE = { eje1: 'E1', eje2: 'E2', eje3: 'E3', dt: 'DT' }
+/* ========== Diagrama ========== */
 
-function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
-  const containerRef = useRef(null)
-  const [nodes, setNodes] = useState(INITIAL_NODES)
-  const [draggingKey, setDraggingKey] = useState(null)
-  const dragState = useRef(null)
-  // La animación de líneas SOLO debe ejecutarse al montar. Después, deshabilitarla.
+interface DiagramProps {
+  activeKind: Kind | null
+  setActiveKind: Dispatch<SetStateAction<Kind | null>>
+  activeDim: NodeKey | null
+  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>
+}
+
+function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: DiagramProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [nodes, setNodes] = useState<Record<NodeKey, NodeData>>(INITIAL_NODES)
+  const [draggingKey, setDraggingKey] = useState<NodeKey | null>(null)
+  const dragState = useRef<DragState | null>(null)
   const [linesAnimated, setLinesAnimated] = useState(false)
 
   useEffect(() => {
-    // Duración de la animación más el delay máximo
     const t = setTimeout(() => setLinesAnimated(true), 1800 + EDGES.length * 60)
     return () => clearTimeout(t)
   }, [])
 
-  const px = (x) => `${(x / VB_W) * 100}%`
-  const py = (y) => `${(y / VB_H) * 100}%`
+  const px = (x: number) => `${(x / VB_W) * 100}%`
+  const py = (y: number) => `${(y / VB_H) * 100}%`
 
   const resetPositions = useCallback(() => setNodes(INITIAL_NODES), [])
 
-  /** Comienza el arrastre */
-  const onPointerDown = useCallback((key, e) => {
-    if (!containerRef.current) return
-    e.currentTarget.setPointerCapture?.(e.pointerId)
-    const rect = containerRef.current.getBoundingClientRect()
-    dragState.current = {
-      key,
-      startClientX: e.clientX,
-      startClientY: e.clientY,
-      startX: nodes[key].x,
-      startY: nodes[key].y,
-      rectW: rect.width,
-      rectH: rect.height,
-      moved: false,
-    }
-    setDraggingKey(key)
-  }, [nodes])
+  const onPointerDown = useCallback(
+    (key: NodeKey, e: RPointerEvent<HTMLDivElement>) => {
+      if (!containerRef.current) return
+      e.currentTarget.setPointerCapture?.(e.pointerId)
+      const rect = containerRef.current.getBoundingClientRect()
+      dragState.current = {
+        key,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startX: nodes[key].x,
+        startY: nodes[key].y,
+        rectW: rect.width,
+        rectH: rect.height,
+        moved: false,
+      }
+      setDraggingKey(key)
+    },
+    [nodes],
+  )
 
-  const onPointerMove = useCallback((e) => {
+  const onPointerMove = useCallback((e: RPointerEvent<HTMLDivElement>) => {
     const s = dragState.current
     if (!s) return
     const dx = ((e.clientX - s.startClientX) / s.rectW) * VB_W
@@ -328,13 +411,13 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
     })
   }, [])
 
-  const onPointerUp = useCallback((e) => {
+  const onPointerUp = useCallback((e: RPointerEvent<HTMLDivElement>) => {
     e.currentTarget.releasePointerCapture?.(e.pointerId)
     dragState.current = null
     setDraggingKey(null)
   }, [])
 
-  const isDimmed = (key, kind) => {
+  const isDimmed = (key: NodeKey, kind: Kind): boolean => {
     if (draggingKey === key) return false
     if (activeDim && activeDim === key) return false
     if (activeDim) return true
@@ -342,17 +425,26 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
     return kind !== activeKind && kind !== 'core'
   }
 
-  const isActive = (key) => activeDim === key
+  const isActive = (key: NodeKey): boolean => activeDim === key
+
+  const nodeEntries = Object.entries(nodes) as Array<[NodeKey, NodeData]>
+
+  // Derivar la key del tooltip a partir de los estados existentes
+  let tooltipKey: NodeKey | null = null
+  if (draggingKey) tooltipKey = draggingKey
+  else if (activeDim) tooltipKey = activeDim
+  else if (activeKind && activeKind !== 'core') tooltipKey = KIND_TO_EJE[activeKind]
+  const tooltipNode = tooltipKey ? nodes[tooltipKey] : null
 
   return (
     <div
       className="relative flex h-full w-full flex-col"
-      style={{ containerType: 'size' }}
+      style={{ containerType: 'size' } as CSSProperties}
     >
       {/* Controles */}
       <div className="mb-2 flex shrink-0 items-center justify-end gap-2 sm:gap-3">
         <span className="hidden items-center gap-2 rounded-full border border-line bg-white/80 px-3 py-1.5 text-[11px] text-ink-soft backdrop-blur sm:flex">
-          <span className="size-3 [&_svg]:size-full text-muted">{I.grip}</span>
+          <span className="size-3 text-muted [&_svg]:size-full">{I.grip}</span>
           Arrastra los nodos
         </span>
         <button
@@ -391,15 +483,15 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
             const dx = B.x - A.x
             const dy = B.y - A.y
             const len = Math.hypot(dx, dy) || 1
-            const ux = dx / len, uy = dy / len
+            const ux = dx / len
+            const uy = dy / len
             const x1 = A.x + ux * A.r
             const y1 = A.y + uy * A.r
             const x2 = B.x - ux * B.r
             const y2 = B.y - uy * B.r
 
-            const dim =
-              (activeKind && B.kind !== activeKind && a !== 'CORE') ||
-              (activeKind && a === 'CORE' && !(b === 'E1' || b === 'E2' || b === 'E3' || b === 'DT' ? false : false))
+            // Atenuar la línea si hay un eje activo y este lado no pertenece
+            const dim = !!activeKind && B.kind !== activeKind
 
             const color = KIND_COLOR[B.kind].stroke
             return (
@@ -421,7 +513,7 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
         </svg>
 
         {/* Nodos */}
-        {Object.entries(nodes).map(([key, n]) => {
+        {nodeEntries.map(([key, n]) => {
           const c = KIND_COLOR[n.kind]
           const size = (n.r * 2 / VB_W) * 100
           const left = px(n.x - n.r)
@@ -433,7 +525,7 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
           const isDragging = draggingKey === key
 
           const isCore = n.kind === 'core'
-          const isEje = ['E1', 'E2', 'E3', 'DT'].includes(key)
+          const isEje = EJE_KEYS.has(key)
 
           const onEnter = () => {
             if (draggingKey) return
@@ -460,7 +552,7 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
               className={`node group absolute grid place-items-center rounded-full text-center outline-none ${
                 dim ? 'node--dim' : ''
               } ${active ? 'node--active' : ''} ${isCore && !draggingKey ? 'pulse-soft' : ''} ${
-                isDragging ? 'cursor-grabbing z-20' : 'cursor-grab'
+                isDragging ? 'z-20 cursor-grabbing' : 'cursor-grab'
               }`}
               style={{
                 left,
@@ -504,33 +596,25 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
                     {n.sub}
                   </span>
                 </span>
-              ) : (
+              ) : n.icon ? (
                 <span className="flex flex-col items-center justify-center gap-0.5">
                   <span className="size-[55%] [&_svg]:size-full">{I[n.icon]}</span>
                   <span className="font-display text-[clamp(6.5px,0.8vw,8.5px)] font-semibold tracking-wide">
                     {n.label}
                   </span>
                 </span>
-              )}
+              ) : null}
             </div>
           )
         })}
 
         {/* Tooltip flotante */}
-        {(() => {
-          let key = null
-          if (draggingKey) key = draggingKey
-          else if (activeDim) key = activeDim
-          else if (activeKind) key = KIND_TO_EJE[activeKind]
-          if (!key || !nodes[key]) return null
-          const n = nodes[key]
-          return (
-            <NodeTooltip
-              node={{ key, x: n.x, y: n.y, r: n.r }}
-              kind={n.kind}
-            />
-          )
-        })()}
+        {tooltipKey && tooltipNode && (
+          <NodeTooltip
+            node={{ key: tooltipKey, x: tooltipNode.x, y: tooltipNode.y, r: tooltipNode.r }}
+            kind={tooltipNode.kind}
+          />
+        )}
       </div>
     </div>
   )
@@ -538,7 +622,37 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }) {
 
 /* ========== Tarjetas leyenda ========== */
 
-function LegendCard({ tag, title, kind, items, activeKind, setActiveKind, activeDim, setActiveDim, icon }) {
+interface LegendItem {
+  key: NodeKey
+  label: string
+}
+
+interface LegendCardData {
+  tag: string
+  title: string
+  kind: Kind
+  icon: ReactElement
+  items: LegendItem[]
+}
+
+interface LegendCardProps extends LegendCardData {
+  activeKind: Kind | null
+  setActiveKind: Dispatch<SetStateAction<Kind | null>>
+  activeDim: NodeKey | null
+  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>
+}
+
+function LegendCard({
+  tag,
+  title,
+  kind,
+  items,
+  activeKind,
+  setActiveKind,
+  activeDim,
+  setActiveDim,
+  icon,
+}: LegendCardProps) {
   const c = KIND_COLOR[kind]
   const isThisActive = activeKind === kind
   return (
@@ -571,16 +685,24 @@ function LegendCard({ tag, title, kind, items, activeKind, setActiveKind, active
         </span>
       </div>
 
-      <ul className={`mt-2.5 grid gap-y-1 text-[11.5px] text-ink-soft sm:gap-y-1 sm:text-[12px] ${
-        items.length > 3 ? 'grid-cols-2 gap-x-2 sm:gap-x-3' : 'grid-cols-1'
-      }`}>
+      <ul
+        className={`mt-2.5 grid gap-y-1 text-[11.5px] text-ink-soft sm:gap-y-1 sm:text-[12px] ${
+          items.length > 3 ? 'grid-cols-2 gap-x-2 sm:gap-x-3' : 'grid-cols-1'
+        }`}
+      >
         {items.map((it) => {
           const isActive = activeDim === it.key
           return (
             <li
               key={it.key}
-              onMouseEnter={(e) => { e.stopPropagation(); setActiveDim(it.key) }}
-              onMouseLeave={(e) => { e.stopPropagation(); setActiveDim(null) }}
+              onMouseEnter={(e) => {
+                e.stopPropagation()
+                setActiveDim(it.key)
+              }}
+              onMouseLeave={(e) => {
+                e.stopPropagation()
+                setActiveDim(null)
+              }}
               className="flex cursor-default items-center gap-2 rounded-md px-1.5 py-0.5 transition-colors"
               style={{
                 background: isActive ? c.soft : 'transparent',
@@ -588,7 +710,10 @@ function LegendCard({ tag, title, kind, items, activeKind, setActiveKind, active
               }}
             >
               <span className="size-1.5 shrink-0 rounded-full" style={{ background: c.stroke }} />
-              <span className="font-display text-[11px] font-semibold sm:text-[11.5px]" style={{ color: c.stroke }}>
+              <span
+                className="font-display text-[11px] font-semibold sm:text-[11.5px]"
+                style={{ color: c.stroke }}
+              >
                 {it.key}
               </span>
               <span className="truncate">{it.label}</span>
@@ -633,10 +758,10 @@ function BottomStrip() {
 /* ========== App ========== */
 
 export default function App() {
-  const [activeKind, setActiveKind] = useState(null)
-  const [activeDim, setActiveDim] = useState(null)
+  const [activeKind, setActiveKind] = useState<Kind | null>(null)
+  const [activeDim, setActiveDim] = useState<NodeKey | null>(null)
 
-  const cards = useMemo(
+  const cards = useMemo<LegendCardData[]>(
     () => [
       {
         tag: 'EJE 1',
@@ -679,10 +804,11 @@ export default function App() {
         title: 'Ética e Integridad',
         kind: 'dt',
         icon: I.scales,
-        items: [{ key: 'D12', label: 'Ética e Integridad' }],
+        // D12 no existe en el grafo (es una dimensión solo en la leyenda)
+        items: [{ key: 'DT', label: 'D12 — Ética e Integridad' }],
       },
     ],
-    []
+    [],
   )
 
   return (
