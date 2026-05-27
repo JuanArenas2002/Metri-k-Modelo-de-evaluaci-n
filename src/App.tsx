@@ -9,7 +9,7 @@ import {
   type PointerEvent as RPointerEvent,
   type ReactElement,
   type SetStateAction,
-} from 'react'
+} from "react";
 import {
   Star,
   Microscope,
@@ -29,10 +29,10 @@ import {
   Globe2,
   GripVertical,
   RotateCcw,
-} from 'lucide-react'
-import './App.css'
-import Edificio from './assets/Edificio.png'
-import LogoPng from './assets/metrik.png'
+} from "lucide-react";
+import "./App.css";
+import Edificio from "./assets/Edificio.png";
+/*import LogoPng from "./assets/metrik.png";
 
 /* ─────────────────────────────────────────────────────────────
    METRI-K · Modelo de evaluación de líneas de investigación
@@ -41,87 +41,84 @@ import LogoPng from './assets/metrik.png'
 /* ========== Iconos (lucide-react) ========== */
 
 const I = {
-  star:        <Star strokeWidth={2} />,
-  microscope:  <Microscope strokeWidth={1.8} />,
-  chart:       <BarChart3 strokeWidth={2} />,
-  puzzle:      <Puzzle strokeWidth={1.8} />,
-  target:      <Target strokeWidth={1.8} />,
-  people:      <Users strokeWidth={1.8} />,
-  leaf:        <Leaf strokeWidth={1.8} />,
-  cap:         <GraduationCap strokeWidth={1.8} />,
-  handshake:   <Handshake strokeWidth={1.8} />,
-  globe:       <Globe strokeWidth={1.6} />,
-  building:    <Building2 strokeWidth={1.6} />,
-  megaphone:   <Megaphone strokeWidth={1.8} />,
-  scales:      <Scale strokeWidth={1.8} />,
+  star: <Star strokeWidth={2} />,
+  microscope: <Microscope strokeWidth={1.8} />,
+  chart: <BarChart3 strokeWidth={2} />,
+  puzzle: <Puzzle strokeWidth={1.8} />,
+  target: <Target strokeWidth={1.8} />,
+  people: <Users strokeWidth={1.8} />,
+  leaf: <Leaf strokeWidth={1.8} />,
+  cap: <GraduationCap strokeWidth={1.8} />,
+  handshake: <Handshake strokeWidth={1.8} />,
+  globe: <Globe strokeWidth={1.6} />,
+  building: <Building2 strokeWidth={1.6} />,
+  megaphone: <Megaphone strokeWidth={1.8} />,
+  scales: <Scale strokeWidth={1.8} />,
   shieldCheck: <ShieldCheck strokeWidth={1.8} />,
-  impact:      <TrendingUp strokeWidth={1.8} />,
-  trendUp:     <TrendingUp strokeWidth={1.8} />,
-  globeAlt:    <Globe2 strokeWidth={1.6} />,
-  grip:        <GripVertical strokeWidth={1.8} />,
-  reset:       <RotateCcw strokeWidth={1.8} />,
-} satisfies Record<string, ReactElement>
+  impact: <TrendingUp strokeWidth={1.8} />,
+  trendUp: <TrendingUp strokeWidth={1.8} />,
+  globeAlt: <Globe2 strokeWidth={1.6} />,
+  grip: <GripVertical strokeWidth={1.8} />,
+  reset: <RotateCcw strokeWidth={1.8} />,
+} satisfies Record<string, ReactElement>;
 
-type IconKey = keyof typeof I
+type IconKey = keyof typeof I;
 
 /* ========== Tipos del dominio ========== */
 
-type Kind = 'core' | 'eje1' | 'eje2' | 'eje3' | 'dt'
+type Kind = "core" | "eje1" | "eje2" | "eje3" | "dt";
 
-type EjeKey = 'E1' | 'E2' | 'E3' | 'DT'
+type EjeKey = "E1" | "E2" | "E3" | "DT";
 type DimKey =
-  | 'D1' | 'D2' | 'D3' | 'D4' | 'D5'
-  | 'D6' | 'D7' | 'D8' | 'D9' | 'D10'
-  | 'D11' | 'D13'
-type NodeKey = 'CORE' | EjeKey | DimKey
+  | "D1"
+  | "D2"
+  | "D3"
+  | "D4"
+  | "D5"
+  | "D6"
+  | "D7"
+  | "D8"
+  | "D9"
+  | "D10"
+  | "D11"
+  | "D13";
+type NodeKey = "CORE" | EjeKey | DimKey;
 
 interface NodeData {
-  x: number
-  y: number
-  r: number
-  label: string
-  kind: Kind
-  sub?: string
-  icon?: IconKey
+  x: number;
+  y: number;
+  r: number;
+  label: string;
+  kind: Kind;
+  sub?: string;
+  icon?: IconKey;
 }
 
 interface KindColor {
-  bg: string
-  stroke: string
-  text: string
-  soft: string
+  bg: string;
+  stroke: string;
+  text: string;
+  soft: string;
 }
 
 interface NodeInfo {
-  title: string
-  meta: string
+  title: string;
+  meta: string;
 }
 
 interface DragState {
-  key: NodeKey
-  startClientX: number
-  startClientY: number
-  startX: number
-  startY: number
-  rectW: number
-  rectH: number
-  moved: boolean
+  key: NodeKey;
+  startClientX: number;
+  startClientY: number;
+  startX: number;
+  startY: number;
+  rectW: number;
+  rectH: number;
+  moved: boolean;
 }
 
 /* ========== Logo ========== */
 
-function Logo() {
-  return (
-    <a href="#" className="block shrink-0" aria-label="METRI-K">
-      <img
-        src={LogoPng}
-        alt="METRI-K"
-        className="h-16 w-auto object-contain sm:h-20 lg:h-20 xl:h-24"
-        draggable="false"
-      />
-    </a>
-  )
-}
 
 /* ========== Cinta superior ========== */
 
@@ -147,11 +144,16 @@ function TopSweep() {
       />
       <g fill="#a9b1b8" opacity="0.4">
         {Array.from({ length: 80 }).map((_, i) => (
-          <circle key={i} cx={20 + i * 19} cy={150 + Math.sin(i * 0.3) * 10} r="1.1" />
+          <circle
+            key={i}
+            cx={20 + i * 19}
+            cy={150 + Math.sin(i * 0.3) * 10}
+            r="1.1"
+          />
         ))}
       </g>
     </svg>
-  )
+  );
 }
 
 /* ========== Header ========== */
@@ -159,10 +161,9 @@ function TopSweep() {
 function Header() {
   return (
     <header
-      className="relative z-10 flex w-full items-start justify-between gap-4 pt-5 sm:pt-6"
-      style={{ paddingInline: 'clamp(1rem, 4vw, 5rem)' }}
+      className="relative z-10 flex w-full items-start justify-end pt-5 sm:pt-6"
+      style={{ paddingInline: "clamp(1rem, 4vw, 5rem)" }}
     >
-      <Logo />
       <div className="text-right leading-snug">
         <div className="font-display text-[clamp(11px,1.1vw,16px)] font-semibold text-teal-deep">
           Formamos para la excelencia,
@@ -172,31 +173,34 @@ function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
 /* ========== Panel izquierdo ========== */
 
 function LeftPanel() {
   const pillars: { icon: ReactElement; label: string }[] = [
-    { icon: I.shieldCheck, label: 'Enfoque integral y sistémico' },
-    { icon: I.impact,      label: 'Impacto académico y social' },
-    { icon: I.trendUp,     label: 'Mejora continua y sostenible' },
-    { icon: I.globeAlt,    label: 'Proyección con ética e integridad' },
-  ]
+    { icon: I.shieldCheck, label: "Enfoque integral y sistémico" },
+    { icon: I.impact, label: "Impacto académico y social" },
+    { icon: I.chart, label: "Mejora continua y sostenible" },
+    { icon: I.globeAlt, label: "Proyección con ética e integridad" },
+  ];
   return (
-    <section className="reveal w-full max-w-[clamp(320px,32vw,560px)]" style={{ animationDelay: '120ms' }}>
+    <section
+      className="reveal w-full max-w-[clamp(320px,32vw,560px)]"
+      style={{ animationDelay: "120ms" }}
+    >
       <div className="font-display text-[clamp(15px,1.6vw,20px)] leading-snug text-teal-deep">
         Modelo de evaluación de
       </div>
       <h1 className="font-display mt-0.5 text-[clamp(32px,4.4vw,52px)] font-semibold leading-[1.02] tracking-tight text-ink">
         Líneas de
-        <br className="hidden sm:inline" />{' '}
-        investigación
+        <br className="hidden sm:inline" /> investigación
       </h1>
 
-      <div className="mt-4 inline-flex items-center gap-3 lg:mt-3">
-        <span className="h-px w-8 bg-eje3" />
+      <div className="mt-4 flex flex-col gap-2 lg:mt-3">
+        <span className="h-[6px] w-[15%] bg-eje3 rounded-full" />
+
         <span className="font-display text-[10px] tracking-wider-soft text-eje3 sm:text-[11px]">
           NUESTRO ECOSISTEMA INSTITUCIONAL
         </span>
@@ -218,109 +222,180 @@ function LeftPanel() {
             <span className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-teal-deep">
               <span className="size-4 [&_svg]:size-full">{p.icon}</span>
             </span>
-            <span className="text-[12.5px] text-ink-soft sm:text-[13px]">{p.label}</span>
+            <span className="text-[12.5px] text-ink-soft sm:text-[13px]">
+              {p.label}
+            </span>
           </li>
         ))}
       </ul>
     </section>
-  )
+  );
 }
 
 /* ========== Diagrama: constantes ========== */
 
-const VB_W = 1200
-const VB_H = 720
+const VB_W = 1200;
+const VB_H = 720;
 
 /** Estado inicial de cada nodo: posición y radio en unidades de viewBox */
 const INITIAL_NODES: Record<NodeKey, NodeData> = {
-  CORE: { x: 540, y: 380, r: 100, label: 'MODELO DE EVALUACIÓN', kind: 'core' },
+  CORE: { x: 540, y: 380, r: 100, label: "MODELO DE EVALUACIÓN", kind: "core" },
 
-  E1:   { x: 700,  y: 130, r: 82, label: 'Eje 1', sub: 'Calidad Académica',         kind: 'eje1' },
-  E2:   { x: 260,  y: 510, r: 84, label: 'Eje 2', sub: 'Pertinencia y Coherencia',  kind: 'eje2' },
-  E3:   { x: 840,  y: 380, r: 92, label: 'Eje 3', sub: 'Desarrollo Institucional',  kind: 'eje3' },
-  DT:   { x: 620,  y: 610, r: 58, label: 'DT',    sub: 'Ética e Integridad',        kind: 'dt'   },
+  E1: {
+    x: 700,
+    y: 130,
+    r: 82,
+    label: "Eje 1",
+    sub: "Calidad Académica",
+    kind: "eje1",
+  },
+  E2: {
+    x: 260,
+    y: 510,
+    r: 84,
+    label: "Eje 2",
+    sub: "Pertinencia y Coherencia",
+    kind: "eje2",
+  },
+  E3: {
+    x: 840,
+    y: 380,
+    r: 92,
+    label: "Eje 3",
+    sub: "Desarrollo Institucional",
+    kind: "eje3",
+  },
+  DT: {
+    x: 620,
+    y: 610,
+    r: 58,
+    label: "DT",
+    sub: "Ética e Integridad",
+    kind: "dt",
+  },
 
-  D3:   { x: 870,  y: 50,  r: 28, label: 'D3',  icon: 'star',       kind: 'eje1' },
-  D4:   { x: 935,  y: 165, r: 28, label: 'D4',  icon: 'microscope', kind: 'eje1' },
-  D10:  { x: 855,  y: 260, r: 26, label: 'D10', icon: 'chart',      kind: 'eje1' },
+  D3: { x: 870, y: 50, r: 28, label: "D3", icon: "star", kind: "eje1" },
+  D4: { x: 935, y: 165, r: 28, label: "D4", icon: "microscope", kind: "eje1" },
+  D10: { x: 855, y: 260, r: 26, label: "D10", icon: "chart", kind: "eje1" },
 
-  D1:   { x: 295,  y: 360, r: 28, label: 'D1', icon: 'puzzle', kind: 'eje2' },
-  D2:   { x: 90,   y: 510, r: 28, label: 'D2', icon: 'target', kind: 'eje2' },
-  D5:   { x: 315,  y: 660, r: 28, label: 'D5', icon: 'people', kind: 'eje2' },
+  D1: { x: 295, y: 360, r: 28, label: "D1", icon: "puzzle", kind: "eje2" },
+  D2: { x: 90, y: 510, r: 28, label: "D2", icon: "target", kind: "eje2" },
+  D5: { x: 315, y: 660, r: 28, label: "D5", icon: "people", kind: "eje2" },
 
-  D6:   { x: 1030, y: 195, r: 28, label: 'D6',  icon: 'leaf',      kind: 'eje3' },
-  D7:   { x: 1110, y: 290, r: 28, label: 'D7',  icon: 'cap',       kind: 'eje3' },
-  D8:   { x: 1135, y: 390, r: 28, label: 'D8',  icon: 'handshake', kind: 'eje3' },
-  D11:  { x: 1100, y: 490, r: 28, label: 'D11', icon: 'globe',     kind: 'eje3' },
-  D9:   { x: 1000, y: 575, r: 28, label: 'D9',  icon: 'building',  kind: 'eje3' },
-  D13:  { x: 820,  y: 615, r: 28, label: 'D13', icon: 'megaphone', kind: 'eje3' },
-}
+  D6: { x: 1030, y: 195, r: 28, label: "D6", icon: "leaf", kind: "eje3" },
+  D7: { x: 1110, y: 290, r: 28, label: "D7", icon: "cap", kind: "eje3" },
+  D8: { x: 1135, y: 390, r: 28, label: "D8", icon: "handshake", kind: "eje3" },
+  D11: { x: 1100, y: 490, r: 28, label: "D11", icon: "globe", kind: "eje3" },
+  D9: { x: 1000, y: 575, r: 28, label: "D9", icon: "building", kind: "eje3" },
+  D13: { x: 820, y: 615, r: 28, label: "D13", icon: "megaphone", kind: "eje3" },
+};
 
 const EDGES: ReadonlyArray<readonly [NodeKey, NodeKey]> = [
-  ['CORE', 'E1'], ['CORE', 'E2'], ['CORE', 'E3'], ['CORE', 'DT'],
-  ['E1', 'D3'], ['E1', 'D4'], ['E1', 'D10'],
-  ['E2', 'D1'], ['E2', 'D2'], ['E2', 'D5'],
-  ['E3', 'D6'], ['E3', 'D7'], ['E3', 'D8'], ['E3', 'D11'], ['E3', 'D9'], ['E3', 'D13'],
-]
+  ["CORE", "E1"],
+  ["CORE", "E2"],
+  ["CORE", "E3"],
+  ["CORE", "DT"],
+  ["E1", "D3"],
+  ["E1", "D4"],
+  ["E1", "D10"],
+  ["E2", "D1"],
+  ["E2", "D2"],
+  ["E2", "D5"],
+  ["E3", "D6"],
+  ["E3", "D7"],
+  ["E3", "D8"],
+  ["E3", "D11"],
+  ["E3", "D9"],
+  ["E3", "D13"],
+];
 
 const KIND_COLOR: Record<Kind, KindColor> = {
-  core: { bg: '#2aa39a', stroke: '#1f8a82', text: '#ffffff', soft: '#d8efed' },
-  eje1: { bg: '#98989a', stroke: '#7a7a7c', text: '#ffffff', soft: '#efeff0' },
-  eje2: { bg: '#c97a52', stroke: '#a86238', text: '#ffffff', soft: '#f8e7dd' },
-  eje3: { bg: '#e0526a', stroke: '#b93f54', text: '#ffffff', soft: '#fbdfe4' },
-  dt:   { bg: '#d4b274', stroke: '#b08e4f', text: '#ffffff', soft: '#f6ecd5' },
-}
+  core: { bg: "#2aa39a", stroke: "#1f8a82", text: "#ffffff", soft: "#d8efed" },
+  eje1: { bg: "#98989a", stroke: "#7a7a7c", text: "#ffffff", soft: "#efeff0" },
+  eje2: { bg: "#c97a52", stroke: "#a86238", text: "#ffffff", soft: "#f8e7dd" },
+  eje3: { bg: "#e0526a", stroke: "#b93f54", text: "#ffffff", soft: "#fbdfe4" },
+  dt: { bg: "#d4b274", stroke: "#b08e4f", text: "#ffffff", soft: "#f6ecd5" },
+};
 
 /** Información de cada nodo para el tooltip */
 const NODE_INFO: Record<NodeKey, NodeInfo> = {
-  CORE: { title: 'Modelo de Evaluación',             meta: 'Centro del ecosistema institucional' },
-  E1:   { title: 'Eje 1 · Calidad Académica',        meta: 'Excelencia, impacto científico y productividad' },
-  E2:   { title: 'Eje 2 · Pertinencia y Coherencia', meta: 'Articulación con necesidades sociales' },
-  E3:   { title: 'Eje 3 · Desarrollo Institucional', meta: 'Sostenibilidad y proyección global' },
-  DT:   { title: 'Dimensión Transversal',            meta: 'Ética e integridad en toda actuación' },
-  D1:   { title: 'D1 · Coherencia',                  meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D2:   { title: 'D2 · Pertinencia',                 meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D3:   { title: 'D3 · Excelencia',                  meta: 'Eje 1 · Calidad Académica' },
-  D4:   { title: 'D4 · Impacto Científico',          meta: 'Eje 1 · Calidad Académica' },
-  D5:   { title: 'D5 · Impacto Social',              meta: 'Eje 2 · Pertinencia y Coherencia' },
-  D6:   { title: 'D6 · Sostenibilidad',              meta: 'Eje 3 · Desarrollo Institucional' },
-  D7:   { title: 'D7 · Formación',                   meta: 'Eje 3 · Desarrollo Institucional' },
-  D8:   { title: 'D8 · Colaboración',                meta: 'Eje 3 · Desarrollo Institucional' },
-  D9:   { title: 'D9 · Gobernanza',                  meta: 'Eje 3 · Desarrollo Institucional' },
-  D10:  { title: 'D10 · Productividad',              meta: 'Eje 1 · Calidad Académica' },
-  D11:  { title: 'D11 · Internacionalización',       meta: 'Eje 3 · Desarrollo Institucional' },
-  D13:  { title: 'D13 · Visibilidad',                meta: 'Eje 3 · Desarrollo Institucional' },
-}
+  CORE: {
+    title: "Modelo de Evaluación",
+    meta: "Centro del ecosistema institucional",
+  },
+  E1: {
+    title: "Eje 1 · Calidad Académica",
+    meta: "Excelencia, impacto científico y productividad",
+  },
+  E2: {
+    title: "Eje 2 · Pertinencia y Coherencia",
+    meta: "Articulación con necesidades sociales",
+  },
+  E3: {
+    title: "Eje 3 · Desarrollo Institucional",
+    meta: "Sostenibilidad y proyección global",
+  },
+  DT: {
+    title: "Dimensión Transversal",
+    meta: "Ética e integridad en toda actuación",
+  },
+  D1: { title: "D1 · Coherencia", meta: "Eje 2 · Pertinencia y Coherencia" },
+  D2: { title: "D2 · Pertinencia", meta: "Eje 2 · Pertinencia y Coherencia" },
+  D3: { title: "D3 · Excelencia", meta: "Eje 1 · Calidad Académica" },
+  D4: { title: "D4 · Impacto Científico", meta: "Eje 1 · Calidad Académica" },
+  D5: {
+    title: "D5 · Impacto Social",
+    meta: "Eje 2 · Pertinencia y Coherencia",
+  },
+  D6: {
+    title: "D6 · Sostenibilidad",
+    meta: "Eje 3 · Desarrollo Institucional",
+  },
+  D7: { title: "D7 · Formación", meta: "Eje 3 · Desarrollo Institucional" },
+  D8: { title: "D8 · Colaboración", meta: "Eje 3 · Desarrollo Institucional" },
+  D9: { title: "D9 · Gobernanza", meta: "Eje 3 · Desarrollo Institucional" },
+  D10: { title: "D10 · Productividad", meta: "Eje 1 · Calidad Académica" },
+  D11: {
+    title: "D11 · Internacionalización",
+    meta: "Eje 3 · Desarrollo Institucional",
+  },
+  D13: { title: "D13 · Visibilidad", meta: "Eje 3 · Desarrollo Institucional" },
+};
 
-const KIND_TO_EJE: Record<Exclude<Kind, 'core'>, EjeKey> = {
-  eje1: 'E1',
-  eje2: 'E2',
-  eje3: 'E3',
-  dt:   'DT',
-}
+const KIND_TO_EJE: Record<Exclude<Kind, "core">, EjeKey> = {
+  eje1: "E1",
+  eje2: "E2",
+  eje3: "E3",
+  dt: "DT",
+};
 
-const EJE_KEYS: ReadonlySet<NodeKey> = new Set<NodeKey>(['E1', 'E2', 'E3', 'DT'])
+const EJE_KEYS: ReadonlySet<NodeKey> = new Set<NodeKey>([
+  "E1",
+  "E2",
+  "E3",
+  "DT",
+]);
 
 /* ========== Tooltip flotante ========== */
 
 interface TooltipNode {
-  key: NodeKey
-  x: number
-  y: number
-  r: number
+  key: NodeKey;
+  x: number;
+  y: number;
+  r: number;
 }
 
 interface NodeTooltipProps {
-  node: TooltipNode
-  kind: Kind
+  node: TooltipNode;
+  kind: Kind;
 }
 
 function NodeTooltip({ node, kind }: NodeTooltipProps) {
-  const info = NODE_INFO[node.key]
-  if (!info) return null
-  const c = KIND_COLOR[kind]
-  const left = `${(node.x / VB_W) * 100}%`
-  const top = `${((node.y - node.r) / VB_H) * 100}%`
+  const info = NODE_INFO[node.key];
+  if (!info) return null;
+  const c = KIND_COLOR[kind];
+  const left = `${(node.x / VB_W) * 100}%`;
+  const top = `${((node.y - node.r) / VB_H) * 100}%`;
   return (
     <div
       className="pointer-events-none absolute z-40 -translate-x-1/2 -translate-y-[calc(100%+10px)]"
@@ -348,40 +423,48 @@ function NodeTooltip({ node, kind }: NodeTooltipProps) {
         </span>
       </div>
     </div>
-  )
+  );
 }
 
 /* ========== Diagrama ========== */
 
 interface DiagramProps {
-  activeKind: Kind | null
-  setActiveKind: Dispatch<SetStateAction<Kind | null>>
-  activeDim: NodeKey | null
-  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>
+  activeKind: Kind | null;
+  setActiveKind: Dispatch<SetStateAction<Kind | null>>;
+  activeDim: NodeKey | null;
+  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>;
 }
 
-function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: DiagramProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const [nodes, setNodes] = useState<Record<NodeKey, NodeData>>(INITIAL_NODES)
-  const [draggingKey, setDraggingKey] = useState<NodeKey | null>(null)
-  const dragState = useRef<DragState | null>(null)
-  const [linesAnimated, setLinesAnimated] = useState(false)
+function Diagram({
+  activeKind,
+  setActiveKind,
+  activeDim,
+  setActiveDim,
+}: DiagramProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [nodes, setNodes] = useState<Record<NodeKey, NodeData>>(INITIAL_NODES);
+  const [draggingKey, setDraggingKey] = useState<NodeKey | null>(null);
+  const dragState = useRef<DragState | null>(null);
+  const [linesAnimated, setLinesAnimated] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setLinesAnimated(true), 1800 + EDGES.length * 60)
-    return () => clearTimeout(t)
-  }, [])
+    const t = setTimeout(
+      () => setLinesAnimated(true),
+      1800 + EDGES.length * 60,
+    );
+    return () => clearTimeout(t);
+  }, []);
 
-  const px = (x: number) => `${(x / VB_W) * 100}%`
-  const py = (y: number) => `${(y / VB_H) * 100}%`
+  const px = (x: number) => `${(x / VB_W) * 100}%`;
+  const py = (y: number) => `${(y / VB_H) * 100}%`;
 
-  const resetPositions = useCallback(() => setNodes(INITIAL_NODES), [])
+  const resetPositions = useCallback(() => setNodes(INITIAL_NODES), []);
 
   const onPointerDown = useCallback(
     (key: NodeKey, e: RPointerEvent<HTMLDivElement>) => {
-      if (!containerRef.current) return
-      e.currentTarget.setPointerCapture?.(e.pointerId)
-      const rect = containerRef.current.getBoundingClientRect()
+      if (!containerRef.current) return;
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+      const rect = containerRef.current.getBoundingClientRect();
       dragState.current = {
         key,
         startClientX: e.clientX,
@@ -391,55 +474,56 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
         rectW: rect.width,
         rectH: rect.height,
         moved: false,
-      }
-      setDraggingKey(key)
+      };
+      setDraggingKey(key);
     },
     [nodes],
-  )
+  );
 
   const onPointerMove = useCallback((e: RPointerEvent<HTMLDivElement>) => {
-    const s = dragState.current
-    if (!s) return
-    const dx = ((e.clientX - s.startClientX) / s.rectW) * VB_W
-    const dy = ((e.clientY - s.startClientY) / s.rectH) * VB_H
-    if (Math.abs(dx) + Math.abs(dy) > 2) s.moved = true
+    const s = dragState.current;
+    if (!s) return;
+    const dx = ((e.clientX - s.startClientX) / s.rectW) * VB_W;
+    const dy = ((e.clientY - s.startClientY) / s.rectH) * VB_H;
+    if (Math.abs(dx) + Math.abs(dy) > 2) s.moved = true;
     setNodes((prev) => {
-      const n = prev[s.key]
-      const newX = Math.max(n.r + 4, Math.min(VB_W - n.r - 4, s.startX + dx))
-      const newY = Math.max(n.r + 4, Math.min(VB_H - n.r - 4, s.startY + dy))
-      return { ...prev, [s.key]: { ...n, x: newX, y: newY } }
-    })
-  }, [])
+      const n = prev[s.key];
+      const newX = Math.max(n.r + 4, Math.min(VB_W - n.r - 4, s.startX + dx));
+      const newY = Math.max(n.r + 4, Math.min(VB_H - n.r - 4, s.startY + dy));
+      return { ...prev, [s.key]: { ...n, x: newX, y: newY } };
+    });
+  }, []);
 
   const onPointerUp = useCallback((e: RPointerEvent<HTMLDivElement>) => {
-    e.currentTarget.releasePointerCapture?.(e.pointerId)
-    dragState.current = null
-    setDraggingKey(null)
-  }, [])
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    dragState.current = null;
+    setDraggingKey(null);
+  }, []);
 
   const isDimmed = (key: NodeKey, kind: Kind): boolean => {
-    if (draggingKey === key) return false
-    if (activeDim && activeDim === key) return false
-    if (activeDim) return true
-    if (!activeKind) return false
-    return kind !== activeKind && kind !== 'core'
-  }
+    if (draggingKey === key) return false;
+    if (activeDim && activeDim === key) return false;
+    if (activeDim) return true;
+    if (!activeKind) return false;
+    return kind !== activeKind && kind !== "core";
+  };
 
-  const isActive = (key: NodeKey): boolean => activeDim === key
+  const isActive = (key: NodeKey): boolean => activeDim === key;
 
-  const nodeEntries = Object.entries(nodes) as Array<[NodeKey, NodeData]>
+  const nodeEntries = Object.entries(nodes) as Array<[NodeKey, NodeData]>;
 
   // Derivar la key del tooltip a partir de los estados existentes
-  let tooltipKey: NodeKey | null = null
-  if (draggingKey) tooltipKey = draggingKey
-  else if (activeDim) tooltipKey = activeDim
-  else if (activeKind && activeKind !== 'core') tooltipKey = KIND_TO_EJE[activeKind]
-  const tooltipNode = tooltipKey ? nodes[tooltipKey] : null
+  let tooltipKey: NodeKey | null = null;
+  if (draggingKey) tooltipKey = draggingKey;
+  else if (activeDim) tooltipKey = activeDim;
+  else if (activeKind && activeKind !== "core")
+    tooltipKey = KIND_TO_EJE[activeKind];
+  const tooltipNode = tooltipKey ? nodes[tooltipKey] : null;
 
   return (
     <div
       className="relative flex h-full w-full flex-col"
-      style={{ containerType: 'size' } as CSSProperties}
+      style={{ containerType: "size" } as CSSProperties}
     >
       {/* Controles */}
       <div className="mb-2 flex shrink-0 items-center justify-end gap-2 sm:gap-3">
@@ -466,8 +550,8 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
         style={{
           aspectRatio: `${VB_W} / ${VB_H}`,
           width: `min(100cqw, calc((100cqh - 42px) * ${VB_W} / ${VB_H}))`,
-          maxHeight: 'calc(100cqh - 42px)',
-          animationDelay: '200ms',
+          maxHeight: "calc(100cqh - 42px)",
+          animationDelay: "200ms",
         }}
       >
         {/* Conectores */}
@@ -478,22 +562,22 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
           aria-hidden
         >
           {EDGES.map(([a, b], i) => {
-            const A = nodes[a]
-            const B = nodes[b]
-            const dx = B.x - A.x
-            const dy = B.y - A.y
-            const len = Math.hypot(dx, dy) || 1
-            const ux = dx / len
-            const uy = dy / len
-            const x1 = A.x + ux * A.r
-            const y1 = A.y + uy * A.r
-            const x2 = B.x - ux * B.r
-            const y2 = B.y - uy * B.r
+            const A = nodes[a];
+            const B = nodes[b];
+            const dx = B.x - A.x;
+            const dy = B.y - A.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const ux = dx / len;
+            const uy = dy / len;
+            const x1 = A.x + ux * A.r;
+            const y1 = A.y + uy * A.r;
+            const x2 = B.x - ux * B.r;
+            const y2 = B.y - uy * B.r;
 
             // Atenuar la línea si hay un eje activo y este lado no pertenece
-            const dim = !!activeKind && B.kind !== activeKind
+            const dim = !!activeKind && B.kind !== activeKind;
 
-            const color = KIND_COLOR[B.kind].stroke
+            const color = KIND_COLOR[B.kind].stroke;
             return (
               <line
                 key={`${a}-${b}`}
@@ -505,43 +589,47 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
                 strokeOpacity={dim ? 0.18 : 0.55}
                 strokeWidth={1.5}
                 strokeLinecap="round"
-                className={linesAnimated ? '' : 'draw-line'}
-                style={linesAnimated ? undefined : { animationDelay: `${300 + i * 60}ms` }}
+                className={linesAnimated ? "" : "draw-line"}
+                style={
+                  linesAnimated
+                    ? undefined
+                    : { animationDelay: `${300 + i * 60}ms` }
+                }
               />
-            )
+            );
           })}
         </svg>
 
         {/* Nodos */}
         {nodeEntries.map(([key, n]) => {
-          const c = KIND_COLOR[n.kind]
-          const size = (n.r * 2 / VB_W) * 100
-          const left = px(n.x - n.r)
-          const top = py(n.y - n.r)
-          const width = `${size}%`
+          const c = KIND_COLOR[n.kind];
+          const size = ((n.r * 2) / VB_W) * 100;
+          const left = px(n.x - n.r);
+          const top = py(n.y - n.r);
+          const width = `${size}%`;
 
-          const dim = isDimmed(key, n.kind)
-          const active = isActive(key)
-          const isDragging = draggingKey === key
+          const dim = isDimmed(key, n.kind);
+          const active = isActive(key);
+          const isDragging = draggingKey === key;
 
-          const isCore = n.kind === 'core'
-          const isEje = EJE_KEYS.has(key)
+          const isCore = n.kind === "core";
+          const isEje = EJE_KEYS.has(key);
 
           const onEnter = () => {
-            if (draggingKey) return
+            if (draggingKey) return;
             if (isCore) {
-              setActiveDim('CORE')
-              return
+              setActiveDim("CORE");
+              return;
             }
-            if (isEje) setActiveKind(n.kind)
-            else setActiveDim(key)
-          }
+            if (isEje) setActiveKind(n.kind);
+            else setActiveDim(key);
+          };
           const onLeave = () => {
-            if (draggingKey) return
-            if (isCore) setActiveDim(null)
-            else if (isEje) setActiveKind(null)
-            else setActiveDim(null)
-          }
+            if (draggingKey) return;
+            if (isCore) setActiveDim(null);
+            else if (isEje) setActiveKind(null);
+            else setActiveDim(null);
+          };
 
           return (
             <div
@@ -550,27 +638,27 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
               onMouseLeave={onLeave}
               onPointerDown={(e) => onPointerDown(key, e)}
               className={`node group absolute grid place-items-center rounded-full text-center outline-none ${
-                dim ? 'node--dim' : ''
-              } ${active ? 'node--active' : ''} ${isCore && !draggingKey ? 'pulse-soft' : ''} ${
-                isDragging ? 'z-20 cursor-grabbing' : 'cursor-grab'
+                dim ? "node--dim" : ""
+              } ${active ? "node--active" : ""} ${isCore && !draggingKey ? "pulse-soft" : ""} ${
+                isDragging ? "z-20 cursor-grabbing" : "cursor-grab"
               }`}
               style={{
                 left,
                 top,
                 width,
-                aspectRatio: '1 / 1',
+                aspectRatio: "1 / 1",
                 background: c.bg,
                 color: c.text,
                 border: `2px solid ${c.stroke}`,
                 boxShadow: isDragging
                   ? `0 20px 40px -10px ${c.stroke}66, 0 6px 14px -4px ${c.stroke}55`
                   : isCore
-                  ? '0 10px 30px -10px rgba(42,163,154,0.45), 0 4px 10px -4px rgba(42,163,154,0.30)'
-                  : '0 4px 12px -4px rgba(20,30,40,0.16)',
-                transform: isDragging ? 'scale(1.1)' : undefined,
-                transition: isDragging ? 'box-shadow .15s ease' : undefined,
+                    ? "0 10px 30px -10px rgba(42,163,154,0.45), 0 4px 10px -4px rgba(42,163,154,0.30)"
+                    : "0 4px 12px -4px rgba(20,30,40,0.16)",
+                transform: isDragging ? "scale(1.1)" : undefined,
+                transition: isDragging ? "box-shadow .15s ease" : undefined,
               }}
-              aria-label={`${n.label}${n.sub ? ' — ' + n.sub : ''}`}
+              aria-label={`${n.label}${n.sub ? " — " + n.sub : ""}`}
               role="button"
               tabIndex={0}
             >
@@ -579,7 +667,10 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
                 className="pointer-events-none absolute inset-[-8px] rounded-full transition-opacity"
                 style={{
                   border: `1.5px dashed ${c.stroke}`,
-                  opacity: active || (isEje && activeKind === n.kind) || isDragging ? 0.55 : 0,
+                  opacity:
+                    active || (isEje && activeKind === n.kind) || isDragging
+                      ? 0.55
+                      : 0,
                 }}
               />
 
@@ -591,55 +682,64 @@ function Diagram({ activeKind, setActiveKind, activeDim, setActiveDim }: Diagram
                 </span>
               ) : isEje ? (
                 <span className="px-2 leading-tight">
-                  <span className="block font-display text-[clamp(10px,1.25vw,14px)] font-semibold">{n.label}</span>
+                  <span className="block font-display text-[clamp(10px,1.25vw,14px)] font-semibold">
+                    {n.label}
+                  </span>
                   <span className="block font-display text-[clamp(7.5px,0.95vw,10.5px)] font-medium opacity-95">
                     {n.sub}
                   </span>
                 </span>
               ) : n.icon ? (
                 <span className="flex flex-col items-center justify-center gap-0.5">
-                  <span className="size-[55%] [&_svg]:size-full">{I[n.icon]}</span>
+                  <span className="size-[55%] [&_svg]:size-full">
+                    {I[n.icon]}
+                  </span>
                   <span className="font-display text-[clamp(6.5px,0.8vw,8.5px)] font-semibold tracking-wide">
                     {n.label}
                   </span>
                 </span>
               ) : null}
             </div>
-          )
+          );
         })}
 
         {/* Tooltip flotante */}
         {tooltipKey && tooltipNode && (
           <NodeTooltip
-            node={{ key: tooltipKey, x: tooltipNode.x, y: tooltipNode.y, r: tooltipNode.r }}
+            node={{
+              key: tooltipKey,
+              x: tooltipNode.x,
+              y: tooltipNode.y,
+              r: tooltipNode.r,
+            }}
             kind={tooltipNode.kind}
           />
         )}
       </div>
     </div>
-  )
+  );
 }
 
 /* ========== Tarjetas leyenda ========== */
 
 interface LegendItem {
-  key: NodeKey
-  label: string
+  key: NodeKey;
+  label: string;
 }
 
 interface LegendCardData {
-  tag: string
-  title: string
-  kind: Kind
-  icon: ReactElement
-  items: LegendItem[]
+  tag: string;
+  title: string;
+  kind: Kind;
+  icon: ReactElement;
+  items: LegendItem[];
 }
 
 interface LegendCardProps extends LegendCardData {
-  activeKind: Kind | null
-  setActiveKind: Dispatch<SetStateAction<Kind | null>>
-  activeDim: NodeKey | null
-  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>
+  activeKind: Kind | null;
+  setActiveKind: Dispatch<SetStateAction<Kind | null>>;
+  activeDim: NodeKey | null;
+  setActiveDim: Dispatch<SetStateAction<NodeKey | null>>;
 }
 
 function LegendCard({
@@ -653,15 +753,15 @@ function LegendCard({
   setActiveDim,
   icon,
 }: LegendCardProps) {
-  const c = KIND_COLOR[kind]
-  const isThisActive = activeKind === kind
+  const c = KIND_COLOR[kind];
+  const isThisActive = activeKind === kind;
   return (
     <article
       onMouseEnter={() => setActiveKind(kind)}
       onMouseLeave={() => setActiveKind(null)}
       className="legend-card card-shadow group relative flex h-full flex-col rounded-[12px] border bg-white p-3 sm:p-3.5 lg:p-3"
       style={{
-        borderColor: isThisActive ? c.stroke : '#e6e9ec',
+        borderColor: isThisActive ? c.stroke : "#e6e9ec",
       }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -687,29 +787,32 @@ function LegendCard({
 
       <ul
         className={`mt-2.5 grid gap-y-1 text-[11.5px] text-ink-soft sm:gap-y-1 sm:text-[12px] ${
-          items.length > 3 ? 'grid-cols-2 gap-x-2 sm:gap-x-3' : 'grid-cols-1'
+          items.length > 3 ? "grid-cols-2 gap-x-2 sm:gap-x-3" : "grid-cols-1"
         }`}
       >
         {items.map((it) => {
-          const isActive = activeDim === it.key
+          const isActive = activeDim === it.key;
           return (
             <li
               key={it.key}
               onMouseEnter={(e) => {
-                e.stopPropagation()
-                setActiveDim(it.key)
+                e.stopPropagation();
+                setActiveDim(it.key);
               }}
               onMouseLeave={(e) => {
-                e.stopPropagation()
-                setActiveDim(null)
+                e.stopPropagation();
+                setActiveDim(null);
               }}
               className="flex cursor-default items-center gap-2 rounded-md px-1.5 py-0.5 transition-colors"
               style={{
-                background: isActive ? c.soft : 'transparent',
+                background: isActive ? c.soft : "transparent",
                 color: isActive ? c.stroke : undefined,
               }}
             >
-              <span className="size-1.5 shrink-0 rounded-full" style={{ background: c.stroke }} />
+              <span
+                className="size-1.5 shrink-0 rounded-full"
+                style={{ background: c.stroke }}
+              />
               <span
                 className="font-display text-[11px] font-semibold sm:text-[11.5px]"
                 style={{ color: c.stroke }}
@@ -718,26 +821,26 @@ function LegendCard({
               </span>
               <span className="truncate">{it.label}</span>
             </li>
-          )
+          );
         })}
       </ul>
     </article>
-  )
+  );
 }
 
 /* ========== Franja inferior ========== */
 
 function BottomStrip() {
   const labels = [
-    'Excelencia académica',
-    'Impacto social',
-    'Desarrollo sostenible',
-    'Ética e integridad',
-  ]
+    "Excelencia académica",
+    "Impacto social",
+    "Desarrollo sostenible",
+    "Ética e integridad",
+  ];
   return (
     <div
       className="relative z-10 mt-4 w-full pb-3 lg:mt-2 lg:pb-2"
-      style={{ paddingInline: 'clamp(1rem, 4vw, 5rem)' }}
+      style={{ paddingInline: "clamp(1rem, 4vw, 5rem)" }}
     >
       <div className="flex items-center gap-3 sm:gap-5">
         <span className="hidden h-px flex-1 bg-line sm:block" />
@@ -752,68 +855,68 @@ function BottomStrip() {
         <span className="hidden h-px flex-1 bg-line sm:block" />
       </div>
     </div>
-  )
+  );
 }
 
 /* ========== App ========== */
 
 export default function App() {
-  const [activeKind, setActiveKind] = useState<Kind | null>(null)
-  const [activeDim, setActiveDim] = useState<NodeKey | null>(null)
+  const [activeKind, setActiveKind] = useState<Kind | null>(null);
+  const [activeDim, setActiveDim] = useState<NodeKey | null>(null);
 
   const cards = useMemo<LegendCardData[]>(
     () => [
       {
-        tag: 'EJE 1',
-        title: 'Calidad Académica',
-        kind: 'eje1',
+        tag: "EJE 1",
+        title: "Calidad Académica",
+        kind: "eje1",
         icon: I.shieldCheck,
         items: [
-          { key: 'D3',  label: 'Excelencia' },
-          { key: 'D4',  label: 'Impacto Científico' },
-          { key: 'D10', label: 'Productividad' },
+          { key: "D3", label: "Excelencia" },
+          { key: "D4", label: "Impacto Científico" },
+          { key: "D10", label: "Productividad" },
         ],
       },
       {
-        tag: 'EJE 2',
-        title: 'Pertinencia y Coherencia',
-        kind: 'eje2',
+        tag: "EJE 2",
+        title: "Pertinencia y Coherencia",
+        kind: "eje2",
         icon: I.target,
         items: [
-          { key: 'D1', label: 'Coherencia' },
-          { key: 'D2', label: 'Pertinencia' },
-          { key: 'D5', label: 'Impacto Social' },
+          { key: "D1", label: "Coherencia" },
+          { key: "D2", label: "Pertinencia" },
+          { key: "D5", label: "Impacto Social" },
         ],
       },
       {
-        tag: 'EJE 3',
-        title: 'Desarrollo Institucional',
-        kind: 'eje3',
+        tag: "EJE 3",
+        title: "Desarrollo Institucional",
+        kind: "eje3",
         icon: I.building,
         items: [
-          { key: 'D6',  label: 'Sostenibilidad' },
-          { key: 'D11', label: 'Internacionaliz.' },
-          { key: 'D7',  label: 'Formación' },
-          { key: 'D9',  label: 'Gobernanza' },
-          { key: 'D8',  label: 'Colaboración' },
-          { key: 'D13', label: 'Visibilidad' },
+          { key: "D6", label: "Sostenibilidad" },
+          { key: "D11", label: "Internacionaliz." },
+          { key: "D7", label: "Formación" },
+          { key: "D9", label: "Gobernanza" },
+          { key: "D8", label: "Colaboración" },
+          { key: "D13", label: "Visibilidad" },
         ],
       },
       {
-        tag: 'DIMENSIÓN TRANSVERSAL',
-        title: 'Ética e Integridad',
-        kind: 'dt',
+        tag: "DIMENSIÓN TRANSVERSAL",
+        title: "Ética e Integridad",
+        kind: "dt",
         icon: I.scales,
         // D12 no existe en el grafo (es una dimensión solo en la leyenda)
-        items: [{ key: 'DT', label: 'D12 — Ética e Integridad' }],
+        items: [{ key: "DT", label: "D12 — Ética e Integridad" }],
       },
     ],
     [],
-  )
+  );
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white lg:h-screen lg:min-h-0 lg:overflow-hidden">
-      <TopSweep />
+      {/* <TopSweep /> */}
 
       {/* Edificio decorativo */}
       <img
@@ -821,14 +924,14 @@ export default function App() {
         alt=""
         aria-hidden
         className="pointer-events-none absolute bottom-0 left-0 z-0 opacity-90"
-        style={{ width: 'clamp(180px, 16vw, 360px)' }}
+        style={{ width: "clamp(320px, 28vw, 600px)" }}
       />
 
       <Header />
 
       <main
         className="relative z-10 grid w-full grid-cols-12 gap-[clamp(0.75rem,2vw,2.5rem)] pt-3 lg:flex-1 lg:min-h-0 lg:pt-2"
-        style={{ paddingInline: 'clamp(1rem, 4vw, 5rem)' }}
+        style={{ paddingInline: "clamp(1rem, 4vw, 5rem)" }}
       >
         <div className="col-span-12 flex items-start md:col-span-5 lg:col-span-3 lg:items-center">
           <LeftPanel />
@@ -846,7 +949,7 @@ export default function App() {
 
       <section
         className="relative z-10 mt-6 w-full lg:mt-3"
-        style={{ paddingInline: 'clamp(1rem, 4vw, 5rem)' }}
+        style={{ paddingInline: "clamp(1rem, 4vw, 5rem)" }}
       >
         <div className="grid grid-cols-1 gap-[clamp(0.5rem,1vw,1rem)] sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c, i) => (
@@ -869,5 +972,5 @@ export default function App() {
 
       <BottomStrip />
     </div>
-  )
+  );
 }
