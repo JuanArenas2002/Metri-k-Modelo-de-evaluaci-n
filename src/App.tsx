@@ -122,39 +122,6 @@ interface DragState {
 
 /* ========== Cinta superior ========== */
 
-function TopSweep() {
-  return (
-    <svg
-      className="pointer-events-none absolute left-0 top-0 z-0 w-full"
-      viewBox="0 0 1600 220"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id="sweep" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor="#e7ebee" />
-          <stop offset=".55" stopColor="#dadfe3" />
-          <stop offset="1" stopColor="#cfd5da" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M0 0 L0 120 C 380 200 760 90 1100 130 C 1330 158 1500 120 1600 80 L1600 0 Z"
-        fill="url(#sweep)"
-        opacity="0.55"
-      />
-      <g fill="#a9b1b8" opacity="0.4">
-        {Array.from({ length: 80 }).map((_, i) => (
-          <circle
-            key={i}
-            cx={20 + i * 19}
-            cy={150 + Math.sin(i * 0.3) * 10}
-            r="1.1"
-          />
-        ))}
-      </g>
-    </svg>
-  );
-}
 
 /* ========== Header ========== */
 
