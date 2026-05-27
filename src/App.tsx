@@ -875,7 +875,7 @@ export default function App() {
         kind: "dt",
         icon: I.scales,
         // D12 no existe en el grafo (es una dimensión solo en la leyenda)
-        items: [{ key: "DT", label: "D12 — Ética e Integridad" }],
+        items: [{ key: "DT", label: "D12 Ética e Integridad" }],
       },
     ],
     [],
